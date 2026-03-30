@@ -80,11 +80,15 @@ function displayMealData(meal) {
 	}
 
 	mealContainer.innerHTML = `
-		<img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width:300px;"> 
-		<h2>${meal.strMeal}</h2>
-		<p><strong>Category:</strong> ${meal.strCategory}</p>
-		<h3>Ingredients:</h3>
-		<ul> ${mealIngredientsHTML} </ul>
+		<div class="container">
+			<img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width:300px;">
+			<div>
+				<h2>${meal.strMeal}</h2>
+				<p><strong>Category:</strong> ${meal.strCategory}</p>
+				<h3>Ingredients:</h3>
+				<ul> ${mealIngredientsHTML} </ul>
+			</div>
+		</div>
 		<h3>Instructions:</h3>
 		<ol>
 			${instructionsArray.map(item => `<li>${item}</li>`).join("")}
@@ -148,10 +152,15 @@ function displayCocktailData(cocktail) {
 	}
 
 	cocktailContainer.innerHTML = `
-		<img src="${cocktail.strDrinkThumb}" width="300"</img>
-		<h2>${cocktail.strDrink}</h2>
-		<h3>Ingredients:</h3>
-		<ul> ${drinkIngredientsHTML} </ul>
+		<div class="container">
+			<img src="${cocktail.strDrinkThumb}" width="300"</img>
+			<div>
+				<h2>${cocktail.strDrink}</h2>
+				<h3>Ingredients:</h3>
+				<ul> ${drinkIngredientsHTML} </ul>
+			</div>
+		</div>
+		<h3>Instructions:</h3>
 		<ol>
 			${instructionsArray.map(item => `<li>${item}</li>`).join("")}
 		</ol>
