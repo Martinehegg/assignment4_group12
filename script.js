@@ -48,9 +48,16 @@ function init() {
  Fetch a Random Meal from TheMealDB
  Returns a Promise that resolves with the meal object
  */
-function fetchRandomMeal() {
-    // Fill in
+
+ async function fetchRandomMeal() {
+  const response = await fetch("https://www.themealdb.com/api/json/v1/1/random.php");
+  const data = await response.json();
+  return data.meals[0];
 }
+
+fetchRandomMeal().then(meal => {
+  console.log(meal);
+});
 
 /*
 Display Meal Data in the DOM
@@ -59,7 +66,27 @@ Receives a meal object with fields like:
   strIngredientX, strMeasureX, etc.
 */
 function displayMealData(meal) {
-    // Fill in
+  const mealContainer = document.getElementById("meal-container");
+
+  let mealIngredientsHTML = "";
+  for (let i = 1; i <= 20; i++) {
+    const ingredient = meal [`strIngredient${i}`];
+    const measure = meal[`strMeasure${i}`];
+
+    if (ingredient && ingredient.trim() !== ""){
+      mealIngredientsHTML += ` <li>${ingredient} - ${measure} </li>`;
+    }
+  }
+  
+  mealContainer.innerHTML = `
+  <img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width:300px;"> 
+  <h2>${meal.strMeal}</h2>
+  <p><strong>Category:</strong> ${meal.strCategory}</p>
+  <h3>Ingredients:</h3>
+  <ul> ${mealIngredientsHTML} </ul>
+  <h3>Instructions:</h3>
+  <p>${meal.strInstructions}</p>
+  `
 }
 
 /*
@@ -78,7 +105,14 @@ We call https://www.thecocktaildb.com/api/json/v1/1/search.php?s=DRINK_INGREDIEN
 Don't forget encodeURIComponent()
 If no cocktails found, fetch random
 */
-function fetchCocktailByDrinkIngredient(drinkIngredient) {
+
+async function fetchCocktailByDrinkIngredient(drinkIngredient) {
+  const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(drinkIngredient)}`);
+  const data = await response.json();
+  if (data.drinks && data.drinks.length > 0) {
+    return data.drinks[0];
+  }
+  return fetchRandomCocktail();
     // Fill in
 }
 
@@ -86,7 +120,10 @@ function fetchCocktailByDrinkIngredient(drinkIngredient) {
 Fetch a Random Cocktail (backup in case nothing is found by the search)
 Returns a Promise that resolves to cocktail object
 */
-function fetchRandomCocktail() {
+async function fetchRandomCocktail() {
+  const response = await fetch("https://www.thecocktaildb.com/api/json/v1/1/random.php");
+  const data = await response.json();
+  return data.drinks[0];
     // Fill in
 }
 
@@ -94,6 +131,25 @@ function fetchRandomCocktail() {
 Display Cocktail Data in the DOM
 */
 function displayCocktailData(cocktail) {
+  const cocktailContainer = document.getElementById("cocktail-container");
+
+  let drinkIngredientsHTML = "";
+  for (let i = 1; i <= 15; i++) {
+    const ingredient = cocktail [`strIngredient${i}`];
+    const measure = cocktail[`strMeasure${i}`];
+
+    if (ingredient && ingredient.trim() !== ""){
+      drinkIngredientsHTML += ` <li>${ingredient} - ${measure} </li>`;
+    }
+  }
+
+  cocktailContainer.innerHTML = `
+  <img src="${cocktail.strDrinkThumb}" width="300"</img>
+  <h2>${cocktail.strDrink}</h2>
+  <h3>Ingredients:</h3>
+  <ul> ${drinkIngredientsHTML} </ul>`;
+  
+  
     // Fill in
 }
 
