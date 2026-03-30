@@ -3,90 +3,97 @@ Mapping from MealDB Categories to TheCocktailDB drink ingredient
 You can customize or expand this object to suit your needs.
 */
 const mealCategoryToCocktailIngredient = {
-  Beef: "whiskey",
-  Chicken: "gin",
-  Dessert: "amaretto",
-  Lamb: "vodka",
-  Miscellaneous: "vodka",
-  Pasta: "tequila",
-  Pork: "tequila",
-  Seafood: "rum",
-  Side: "brandy",
-  Starter: "rum",
-  Vegetarian: "gin",
-  Breakfast: "vodka",
-  Goat: "whiskey",
-  Vegan: "rum",
-  // Add more if needed; otherwise default to something like 'cola'
+	Beef: "whiskey",
+	Chicken: "gin",
+	Dessert: "amaretto",
+	Lamb: "vodka",
+	Miscellaneous: "vodka",
+	Pasta: "tequila",
+	Pork: "tequila",
+	Seafood: "rum",
+	Side: "brandy",
+	Starter: "rum",
+	Vegetarian: "gin",
+	Breakfast: "vodka",
+	Goat: "whiskey",
+	Vegan: "rum",
+	// Add more if needed; otherwise default to something like 'cola'
 };
 
 /*
-    2) Main Initialization Function
-       Called on page load to start all the requests:
-       - Fetch random meal
-       - Display meal
-       - Map meal category to spirit
-       - Fetch matching (or random) cocktail
-       - Display cocktail
+	2) Main Initialization Function
+		Called on page load to start all the requests:
+		- Fetch random meal
+		- Display meal
+		- Map meal category to spirit
+		- Fetch matching (or random) cocktail
+		- Display cocktail
 */
 function init() {
-  fetchRandomMeal()
-    .then((meal) => {
-      displayMealData(meal);
-      const spirit = mapMealCategoryToDrinkIngredient(meal.strCategory);
-      return fetchCocktailByDrinkIngredient(spirit);
-    })
-    .then((cocktail) => {
-      displayCocktailData(cocktail);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+	fetchRandomMeal()
+		.then((meal) => {
+			displayMealData(meal);
+			const spirit = mapMealCategoryToDrinkIngredient(meal.strCategory);
+			return fetchCocktailByDrinkIngredient(spirit);
+		})
+		.then((cocktail) => {
+			displayCocktailData(cocktail);
+		})
+		.catch((error) => {
+			console.error("Error:", error);
+		});
 }
 
 /*
- Fetch a Random Meal from TheMealDB
- Returns a Promise that resolves with the meal object
+	Fetch a Random Meal from TheMealDB
+	Returns a Promise that resolves with the meal object
  */
 
- async function fetchRandomMeal() {
-  const response = await fetch("https://www.themealdb.com/api/json/v1/1/random.php");
-  const data = await response.json();
-  return data.meals[0];
+async function fetchRandomMeal() {
+	const response = await fetch("https://www.themealdb.com/api/json/v1/1/random.php");
+	const data = await response.json();
+	return data.meals[0];
 }
 
 fetchRandomMeal().then(meal => {
-  console.log(meal);
+	console.log(meal);
 });
 
 /*
 Display Meal Data in the DOM
 Receives a meal object with fields like:
-  strMeal, strMealThumb, strCategory, strInstructions,
-  strIngredientX, strMeasureX, etc.
+	strMeal, strMealThumb, strCategory, strInstructions,
+	strIngredientX, strMeasureX, etc.
 */
 function displayMealData(meal) {
-  const mealContainer = document.getElementById("meal-container");
+	const mealContainer = document.getElementById("meal-container");
+	const instructionsArray = meal.strInstructions.split(/\r?\n+/)
 
-  let mealIngredientsHTML = "";
-  for (let i = 1; i <= 20; i++) {
-    const ingredient = meal [`strIngredient${i}`];
-    const measure = meal[`strMeasure${i}`];
+	let mealIngredientsHTML = "";
+	for (let i = 1; i <= 20; i++) {
+		const ingredient = meal[`strIngredient${i}`];
+		const measure = meal[`strMeasure${i}`];
 
-    if (ingredient && ingredient.trim() !== ""){
-      mealIngredientsHTML += ` <li>${ingredient} - ${measure} </li>`;
-    }
-  }
-  
-  mealContainer.innerHTML = `
-  <img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width:300px;"> 
-  <h2>${meal.strMeal}</h2>
-  <p><strong>Category:</strong> ${meal.strCategory}</p>
-  <h3>Ingredients:</h3>
-  <ul> ${mealIngredientsHTML} </ul>
-  <h3>Instructions:</h3>
-  <p>${meal.strInstructions}</p>
-  `
+		if (ingredient && ingredient.trim() !== "") {
+			mealIngredientsHTML += ` <li>${ingredient} - ${measure} </li>`;
+		}
+	}
+
+	mealContainer.innerHTML = `
+		<div class="container">
+			<img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width:300px;">
+			<div>
+				<h2>${meal.strMeal}</h2>
+				<p><strong>Category:</strong> ${meal.strCategory}</p>
+				<h3>Ingredients:</h3>
+				<ul> ${mealIngredientsHTML} </ul>
+			</div>
+		</div>
+		<h3>Instructions:</h3>
+		<ol>
+			${instructionsArray.map(item => `<li>${item}</li>`).join("")}
+		</ol>
+	`
 }
 
 /*
@@ -94,8 +101,8 @@ Convert MealDB Category to a TheCocktailDB Spirit
 Looks up category in our map, or defaults to 'cola'
 */
 function mapMealCategoryToDrinkIngredient(category) {
-  if (!category) return "cola";
-  return mealCategoryToCocktailIngredient[category] || "cola";
+	if (!category) return "cola";
+	return mealCategoryToCocktailIngredient[category] || "cola";
 }
 
 /*
@@ -107,13 +114,12 @@ If no cocktails found, fetch random
 */
 
 async function fetchCocktailByDrinkIngredient(drinkIngredient) {
-  const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(drinkIngredient)}`);
-  const data = await response.json();
-  if (data.drinks && data.drinks.length > 0) {
-    return data.drinks[0];
-  }
-  return fetchRandomCocktail();
-    // Fill in
+	const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(drinkIngredient)}`);
+	const data = await response.json();
+	if (data.drinks && data.drinks.length > 0) {
+		return data.drinks[0];
+	}
+	return fetchRandomCocktail();
 }
 
 /*
@@ -121,36 +127,42 @@ Fetch a Random Cocktail (backup in case nothing is found by the search)
 Returns a Promise that resolves to cocktail object
 */
 async function fetchRandomCocktail() {
-  const response = await fetch("https://www.thecocktaildb.com/api/json/v1/1/random.php");
-  const data = await response.json();
-  return data.drinks[0];
-    // Fill in
+	const response = await fetch("https://www.thecocktaildb.com/api/json/v1/1/random.php");
+	const data = await response.json();
+	return data.drinks[0];
 }
 
 /*
 Display Cocktail Data in the DOM
 */
 function displayCocktailData(cocktail) {
-  const cocktailContainer = document.getElementById("cocktail-container");
+	const cocktailContainer = document.getElementById("cocktail-container");
+	const instructionsArray = cocktail.strInstructions.split(/\r?\n+/)
 
-  let drinkIngredientsHTML = "";
-  for (let i = 1; i <= 15; i++) {
-    const ingredient = cocktail [`strIngredient${i}`];
-    const measure = cocktail[`strMeasure${i}`];
+	let drinkIngredientsHTML = "";
+	for (let i = 1; i <= 15; i++) {
+		const ingredient = cocktail[`strIngredient${i}`];
+		const measure = cocktail[`strMeasure${i}`];
 
-    if (ingredient && ingredient.trim() !== ""){
-      drinkIngredientsHTML += ` <li>${ingredient} - ${measure} </li>`;
-    }
-  }
+		if (ingredient && ingredient.trim() !== "") {
+			drinkIngredientsHTML += ` <li>${ingredient} - ${measure} </li>`;
+		}
+	}
 
-  cocktailContainer.innerHTML = `
-  <img src="${cocktail.strDrinkThumb}" width="300"</img>
-  <h2>${cocktail.strDrink}</h2>
-  <h3>Ingredients:</h3>
-  <ul> ${drinkIngredientsHTML} </ul>`;
-  
-  
-    // Fill in
+	cocktailContainer.innerHTML = `
+		<div class="container">
+			<img src="${cocktail.strDrinkThumb}" width="300"</img>
+			<div>
+				<h2>${cocktail.strDrink}</h2>
+				<h3>Ingredients:</h3>
+				<ul> ${drinkIngredientsHTML} </ul>
+			</div>
+		</div>
+		<h3>Instructions:</h3>
+		<ol>
+			${instructionsArray.map(item => `<li>${item}</li>`).join("")}
+		</ol>
+	`;
 }
 
 /*
