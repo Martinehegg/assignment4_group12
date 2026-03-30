@@ -67,6 +67,7 @@ Receives a meal object with fields like:
 */
 function displayMealData(meal) {
 	const mealContainer = document.getElementById("meal-container");
+	const instructionsArray = meal.strInstructions.split(/\r?\n+/)
 
 	let mealIngredientsHTML = "";
 	for (let i = 1; i <= 20; i++) {
@@ -85,7 +86,9 @@ function displayMealData(meal) {
 		<h3>Ingredients:</h3>
 		<ul> ${mealIngredientsHTML} </ul>
 		<h3>Instructions:</h3>
-		<p>${meal.strInstructions}</p>
+		<ol>
+			${instructionsArray.map(item => `<li>${item}</li>`).join("")}
+		</ol>
 	`
 }
 
@@ -132,6 +135,7 @@ Display Cocktail Data in the DOM
 */
 function displayCocktailData(cocktail) {
 	const cocktailContainer = document.getElementById("cocktail-container");
+	const instructionsArray = cocktail.strInstructions.split(/\r?\n+/)
 
 	let drinkIngredientsHTML = "";
 	for (let i = 1; i <= 15; i++) {
@@ -148,6 +152,9 @@ function displayCocktailData(cocktail) {
 		<h2>${cocktail.strDrink}</h2>
 		<h3>Ingredients:</h3>
 		<ul> ${drinkIngredientsHTML} </ul>
+		<ol>
+			${instructionsArray.map(item => `<li>${item}</li>`).join("")}
+		</ol>
 	`;
 
 
